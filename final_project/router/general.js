@@ -58,7 +58,7 @@ public_users.get('/author/:author',function (req, res) {
   if(filteredBooks > 0){
         return res.status(200).send(JSON.stringify(filteredBooks, null, 4));
   } else {
-        return res.status(404).send(`Can not find books of ${req.params.author} in database.`);
+        return res.status(404).send(`Can not find books with Author ${req.params.author} in database.`);
   }
 });
 
