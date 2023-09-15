@@ -24,7 +24,6 @@ const authenticatedUser = (username,password)=>{
 regd_users.post("/login", (req,res) => {
   const username = req.body.username;
   const password = req.body.password;
-
   if(!username || !password){
     return res.status(404).json({message: "Error logging in"});
   } 
@@ -39,14 +38,19 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  let the_book = books[req.params.isbn];
-  if(the_book){
+ let the_book = Object.values(books).filter(function(items){
+    return items.isbn == req.params.isbn;
+  });
+  if(the_book.length>0){
     let username = req.session.authorization.username;
     let reviewContent = req.query.review;
     let now = new Date();
     let date = now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate() + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
     let review = {"review": reviewContent, "date": date};
-    books.reviews[username] = review;
+    console.log(reviewContent);
+    the_book[0].reviews[username] = review;
+    console.log(the_book);
+    console.log(the_book[0].reviews[username])
     return res.status(200).json({message: "Review added successfully"});
   } else {
     return res.status(404).json({message: "Book with " + req.params.isbn + " not found."});
@@ -55,11 +59,13 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
 // delete a book review
 regd_users.delete("/auth/review/:isbn", (req, res) => {
-  let the_book = books[req.params.isbn];
-  if(the_book){
+    let the_book = Object.values(books).filter(function(items){
+        return items.isbn == req.params.isbn;
+      });
+  if(the_book.length>0){
     let username = req.session.authorization.username;
-    if(books.reviews[username]){
-      delete books.reviews[username];
+    if(the_book[0].reviews[username]){
+      delete the_book[0].reviews[username];
       return res.status(200).json({message: "Review deleted successfully"});
     } else {
       return res.status(404).json({message: "Review not found"});
